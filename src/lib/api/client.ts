@@ -96,7 +96,10 @@ export async function apiClient<T>(
 }
 
 export const api = {
-  getProducts: async (sort?: SortOrder): Promise<Product[]> => {
+  getProducts: async (
+    sort?: SortOrder,
+    options?: RequestInit
+  ): Promise<Product[]> => {
     const params = new URLSearchParams();
     params.set("limit", "0"); // Fetch complete catalog so sorting never truncates items
     if (sort) {
@@ -105,9 +108,16 @@ export const api = {
     }
     const query = params.toString() ? `?${params.toString()}` : "";
 
-    const data = await apiClient<RawProductsResponse | RawProduct[]>(`/products${query}`, {
-      cache: "no-store",
-    });
+    const defaultOptions: RequestInit =
+      options?.next || options?.cache ? {} : { cache: "no-store" };
+
+    const data = await apiClient<RawProductsResponse | RawProduct[]>(
+      `/products${query}`,
+      {
+        ...defaultOptions,
+        ...options,
+      }
+    );
 
     const rawProducts = Array.isArray(data) ? data : data.products ?? [];
     return rawProducts.map(normalizeProduct);
