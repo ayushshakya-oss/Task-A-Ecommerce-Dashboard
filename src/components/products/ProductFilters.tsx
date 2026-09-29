@@ -12,6 +12,7 @@ interface ProductFiltersProps {
   categoryCounts: Record<string, number>;
   totalProductsCount: number;
   maxPrice: number;
+  maxPriceLimit?: number;
   onMaxPriceChange: (price: number) => void;
   minRating: number;
   onMinRatingChange: (rating: number) => void;
@@ -29,6 +30,7 @@ export function ProductFilters({
   categoryCounts,
   totalProductsCount,
   maxPrice,
+  maxPriceLimit = 1000,
   onMaxPriceChange,
   minRating,
   onMinRatingChange,
@@ -160,21 +162,21 @@ export function ProductFilters({
             Price Range
           </span>
           <span className="text-xs text-primary font-bold bg-primary-fixed px-2 py-0.5 rounded-md">
-            Up to ${maxPrice}
+            {maxPrice >= maxPriceLimit ? 'All Prices' : `Up to $${maxPrice}`}
           </span>
         </div>
         <input
           type="range"
           min="10"
-          max="1000"
-          step="10"
+          max={maxPriceLimit}
+          step={maxPriceLimit > 2000 ? 50 : 10}
           value={maxPrice}
           onChange={(e) => handlePriceChange(Number(e.target.value))}
           className="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer accent-primary"
         />
         <div className="flex justify-between text-[11px] text-on-surface-variant font-medium">
           <span>$10</span>
-          <span>$1000</span>
+          <span>${maxPriceLimit}</span>
         </div>
       </div>
 

@@ -24,26 +24,34 @@ export function ProductCatalogView({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Dynamic maximum price based on the actual catalog items
+  // Dynamic maximum price ceiling based on the actual catalog items
   const maxPriceLimit = useMemo(() => {
     if (initialProducts.length === 0) return 1000;
     const highest = Math.max(...initialProducts.map((p) => p.price));
     return Math.ceil(highest / 500) * 500 || 1000;
   }, [initialProducts]);
 
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    searchParams.get("category") || "all",
-  );
-  const [maxPrice, setMaxPrice] = useState<number>(() => {
-    const param = searchParams.get("maxPrice");
-    return param ? Number(param) : maxPriceLimit;
-  });
-  const [minRating, setMinRating] = useState<number>(
-    Number(searchParams.get("minRating")) || 0,
-  );
+  // Single Source of Truth: URL Search Params
+  const selectedCategory = searchParams.get("category") || "all";
+  const urlSearch = searchParams.get("search") || "";
+  const maxPriceParam = searchParams.get("maxPrice");
+  const maxPrice = maxPriceParam ? Number(maxPriceParam) : maxPriceLimit;
+  const minRating = Number(searchParams.get("minRating")) || 0;
+
+  // Local state for the search input for responsive typing
+  const [search, setSearch] = useState(urlSearch);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 8;
+  const pageSize = 9;
+
+  // Keep local search input in sync if URL search param changes (e.g. from Header search or reset)
+  useEffect(() => {
+    setSearch(urlSearch);
+  }, [urlSearch]);
+
+  // Reset page to 1 whenever any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, urlSearch, maxPriceParam, minRating, currentSort]);
 
   // Compute category item counts from initial products
   const categoryCounts = useMemo(() => {
@@ -55,29 +63,67 @@ export function ProductCatalogView({
     return counts;
   }, [initialProducts]);
 
-  // Sync state to URL search params
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (currentSort) params.set("sort", currentSort);
-    if (search.trim()) params.set("search", search.trim());
-    if (selectedCategory !== "all") params.set("category", selectedCategory);
-    if (maxPrice < maxPriceLimit) params.set("maxPrice", maxPrice.toString());
-    if (minRating > 0) params.set("minRating", minRating.toString());
+  // Centralized URL updater that preserves all active query parameters
+  const updateUrlParam = (
+    updates: Record<string, string | number | null | undefined>,
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        (key === "category" && value === "all") ||
+        (key === "minRating" && Number(value) <= 0) ||
+        (key === "maxPrice" && Number(value) >= maxPriceLimit)
+      ) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [
-    search,
-    selectedCategory,
-    maxPrice,
-    minRating,
-    currentSort,
-    pathname,
-    router,
-  ]);
+  };
 
-  // Multi-attribute client-side filtering
+  const handleCategoryChange = (cat: string) => {
+    updateUrlParam({ category: cat });
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    updateUrlParam({ search: val.trim() || null });
+  };
+
+  const handleMaxPriceChange = (price: number) => {
+    updateUrlParam({ maxPrice: price });
+  };
+
+  const handleMinRatingChange = (rating: number) => {
+    updateUrlParam({ minRating: rating });
+  };
+
+  const handleSortChange = (newSort: SortOrder) => {
+    updateUrlParam({ sort: newSort });
+    if (typeof window !== "undefined" && window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSearch("");
+    const params = new URLSearchParams();
+    if (currentSort) params.set("sort", currentSort);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    if (typeof window !== "undefined" && window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  // Multi-attribute client-side filtering and sorting
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter((product) => {
+    const list = initialProducts.filter((product) => {
       const matchesSearch =
         !search.trim() ||
         product.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -87,7 +133,8 @@ export function ProductCatalogView({
         selectedCategory === "all" ||
         product.category.toLowerCase() === selectedCategory.toLowerCase();
 
-      const matchesPrice = product.price <= maxPrice;
+      const matchesPrice =
+        maxPrice >= maxPriceLimit ? true : product.price <= maxPrice;
       const rate =
         typeof product.rating === "object" && product.rating !== null
           ? product.rating.rate
@@ -96,6 +143,13 @@ export function ProductCatalogView({
 
       return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     });
+
+    return [...list].sort((a, b) => {
+      if (currentSort === "desc") {
+        return b.id - a.id;
+      }
+      return a.id - b.id;
+    });
   }, [
     initialProducts,
     search,
@@ -103,6 +157,7 @@ export function ProductCatalogView({
     maxPrice,
     maxPriceLimit,
     minRating,
+    currentSort,
   ]);
 
   // Active filters count
@@ -113,34 +168,14 @@ export function ProductCatalogView({
     if (maxPrice < maxPriceLimit) count++;
     if (minRating > 0) count++;
     return count;
-  }, [search, selectedCategory, maxPrice, minRating]);
+  }, [search, selectedCategory, maxPrice, maxPriceLimit, minRating]);
 
   // Pagination calculation
   const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filteredProducts.slice(start, start + pageSize);
-  }, [filteredProducts, currentPage]);
-
-  const handleSortChange = (newSort: SortOrder) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sort", newSort);
-    router.push(`${pathname}?${params.toString()}`);
-    if (typeof window !== "undefined" && window.scrollY > 0) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  const handleResetFilters = () => {
-    setSearch("");
-    setSelectedCategory("all");
-    setMaxPrice(maxPriceLimit);
-    setMinRating(0);
-    setCurrentPage(1);
-    if (typeof window !== "undefined" && window.scrollY > 0) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  }, [filteredProducts, currentPage, pageSize]);
 
   return (
     <div className="w-full">
@@ -176,34 +211,23 @@ export function ProductCatalogView({
           {/* Reusable Filters Sidebar */}
           <ProductFilters
             search={search}
-            onSearchChange={(val) => {
-              setSearch(val);
-              setCurrentPage(1);
-            }}
+            onSearchChange={handleSearchChange}
             selectedCategory={selectedCategory}
-            onCategoryChange={(cat) => {
-              setSelectedCategory(cat);
-              setCurrentPage(1);
-            }}
+            onCategoryChange={handleCategoryChange}
             categories={categories}
             categoryCounts={categoryCounts}
             totalProductsCount={initialProducts.length}
             maxPrice={maxPrice}
-            onMaxPriceChange={(price) => {
-              setMaxPrice(price);
-              setCurrentPage(1);
-            }}
+            maxPriceLimit={maxPriceLimit}
+            onMaxPriceChange={handleMaxPriceChange}
             minRating={minRating}
-            onMinRatingChange={(rating) => {
-              setMinRating(rating);
-              setCurrentPage(1);
-            }}
+            onMinRatingChange={handleMinRatingChange}
             activeFiltersCount={activeFiltersCount}
             onResetFilters={handleResetFilters}
           />
 
           {/* Product Grid & Pagination */}
-          <div className="flex-1 w-full flex flex-col gap-space-lg">
+          <div className="flex-1 min-w-0 w-full flex flex-col gap-space-lg">
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg">
                 {paginatedProducts.map((product) => (
