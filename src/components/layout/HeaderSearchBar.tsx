@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { Search, ChevronDown, Command } from 'lucide-react';
+import { Search, Command } from 'lucide-react';
+import { HeaderCategoryDropdown } from './HeaderCategoryDropdown';
 
 interface HeaderSearchBarProps {
   search: string;
@@ -68,26 +69,12 @@ export function HeaderSearchBar({
         </kbd>
       </div>
 
-      {/* Styled Dynamic Category Selector */}
-      <div className="relative shrink-0">
-        <select
-          value={selectedCategory}
-          onChange={(e) => onCategorySelect(e.target.value)}
-          className="appearance-none bg-surface-container-low text-xs text-on-surface-variant font-medium py-2 pl-3 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-surface-tint/20 hover:text-on-surface cursor-pointer max-w-[170px] truncate border border-transparent hover:border-surface-container transition-all"
-        >
-          <option value="all">All Categories</option>
-          {categories.map((cat) => (
-            <option
-              key={cat}
-              value={cat}
-              className="capitalize bg-surface-container-lowest text-on-surface"
-            >
-              {cat.replace(/-/g, ' ')}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="w-3.5 h-3.5 text-outline absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-      </div>
+      {/* Custom Dynamic Category Selector */}
+      <HeaderCategoryDropdown
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategorySelect={onCategorySelect}
+      />
     </form>
   );
 }
