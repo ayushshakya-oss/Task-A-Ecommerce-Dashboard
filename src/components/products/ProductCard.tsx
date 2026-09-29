@@ -97,7 +97,7 @@ export function ProductCard({ product }: { product: Product }) {
 
           <button
             onClick={handleAddToCart}
-            className={`flex-1 py-2 px-space-sm font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all text-xs cursor-pointer ${
+            className={`flex-1 min-w-0 py-2 px-space-sm font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all text-xs cursor-pointer ${
               added
                 ? "bg-secondary text-on-secondary"
                 : "bg-primary-container hover:bg-primary text-on-primary"
@@ -106,11 +106,11 @@ export function ProductCard({ product }: { product: Product }) {
           >
             {added ? (
               <>
-                <Check className="w-4 h-4" /> Added
+                <Check className="w-4 h-4 shrink-0" /> <span className="truncate">Added</span>
               </>
             ) : (
               <>
-                <ShoppingCart className="w-4 h-4" /> Add to Cart
+                <ShoppingCart className="w-4 h-4 shrink-0" /> <span className="truncate">Add to Cart</span>
               </>
             )}
           </button>

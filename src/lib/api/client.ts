@@ -98,11 +98,10 @@ export async function apiClient<T>(
 export const api = {
   getProducts: async (sort?: SortOrder): Promise<Product[]> => {
     const params = new URLSearchParams();
-    params.set("limit", "100");
+    params.set("limit", "0"); // Fetch complete catalog so sorting never truncates items
     if (sort) {
-      params.set("sortBy", "title");
+      params.set("sortBy", "id");
       params.set("order", sort);
-      params.set("sort", sort);
     }
     const query = params.toString() ? `?${params.toString()}` : "";
 

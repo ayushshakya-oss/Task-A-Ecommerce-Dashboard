@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/stores/cart-store';
 import { api } from '@/lib/api/client';
 import { PromoBanner } from './PromoBanner';
@@ -12,11 +12,8 @@ import { CartBadgeButton } from './CartBadgeButton';
 import { UserProfileDropdown } from './UserProfileDropdown';
 
 export function Header() {
-  const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [headerSearch, setHeaderSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState<string[]>([]);
 
   const totalItems = useCartStore((state) => state.getTotalItems());
@@ -32,22 +29,6 @@ export function Header() {
       })
       .catch(() => {});
   }, []);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (headerSearch.trim()) params.set('search', headerSearch.trim());
-    if (selectedCategory !== 'all') params.set('category', selectedCategory);
-    router.push(`/products?${params.toString()}`);
-  };
-
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-    const params = new URLSearchParams();
-    if (headerSearch.trim()) params.set('search', headerSearch.trim());
-    if (category !== 'all') params.set('category', category);
-    router.push(`/products?${params.toString()}`);
-  };
 
   const isNavActive = (href: string) => {
     if (href === '/products') {
@@ -94,15 +75,14 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Global Search Bar with Dynamic Category Selector */}
-        <HeaderSearchBar
-          search={headerSearch}
-          onSearchChange={setHeaderSearch}
-          selectedCategory={selectedCategory}
-          onCategorySelect={handleCategorySelect}
-          categories={categories}
-          onSubmit={handleSearchSubmit}
-        />
+        {/* Global Search Bar with Dynamic Category Selector wrapped in Suspense */}
+        <Suspense
+          fallback={
+            <div className="flex-1 max-w-2xl hidden md:block h-9 bg-surface-container-low rounded-lg animate-pulse" />
+          }
+        >
+          <HeaderSearchBar categories={categories} />
+        </Suspense>
 
         {/* Right Section: Cart Badge & Profile Dropdown */}
         <div className="flex items-center gap-space-md shrink-0">

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { ArrowUpDown, Check } from 'lucide-react';
-import { SortOrder } from '@/types';
+import React, { useState } from "react";
+import { ArrowUpDown, Check } from "lucide-react";
+import { SortOrder } from "@/types";
 
 interface ProductSortDropdownProps {
   currentSort: SortOrder;
@@ -13,7 +13,7 @@ interface ProductSortDropdownProps {
 export function ProductSortDropdown({
   currentSort,
   onSortChange,
-  className = '',
+  className = "",
 }: ProductSortDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,9 +31,9 @@ export function ProductSortDropdown({
       >
         <span className="text-on-surface-variant">Sort by:</span>
         <span className="font-semibold text-primary capitalize">
-          {currentSort === 'asc'
-            ? 'Price / ID (Ascending)'
-            : 'Price / ID (Descending)'}
+          {currentSort === "asc"
+            ? "Price / ID (Ascending)"
+            : "Price / ID (Descending)"}
         </span>
         <ArrowUpDown className="w-3.5 h-3.5 text-outline" />
       </button>
@@ -41,22 +41,22 @@ export function ProductSortDropdown({
       {isOpen && (
         <div className="absolute right-0 mt-space-xs w-56 rounded-xl bg-surface-container-lowest shadow-xl border border-surface-container z-30 p-1">
           <button
-            onClick={() => handleSelect('asc')}
+            onClick={() => handleSelect("asc")}
             className="w-full text-left px-space-md py-2 rounded-lg text-xs hover:bg-surface-container-low text-on-surface font-semibold flex items-center justify-between cursor-pointer"
             type="button"
           >
-            Ascending (?sort=asc)
-            {currentSort === 'asc' && (
+            Ascending
+            {currentSort === "asc" && (
               <Check className="w-4 h-4 text-primary" />
             )}
           </button>
           <button
-            onClick={() => handleSelect('desc')}
+            onClick={() => handleSelect("desc")}
             className="w-full text-left px-space-md py-2 rounded-lg text-xs hover:bg-surface-container-low text-on-surface font-semibold flex items-center justify-between cursor-pointer"
             type="button"
           >
-            Descending (?sort=desc)
-            {currentSort === 'desc' && (
+            Descending
+            {currentSort === "desc" && (
               <Check className="w-4 h-4 text-primary" />
             )}
           </button>
