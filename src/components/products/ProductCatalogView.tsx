@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { Product, SortOrder } from '@/types';
-import { ProductCard } from './ProductCard';
-import { ProductFilters } from './ProductFilters';
-import { ProductSortDropdown } from './ProductSortDropdown';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Pagination } from '@/components/ui/Pagination';
+import React, { useState, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { Product, SortOrder } from "@/types";
+import { ProductCard } from "./ProductCard";
+import { ProductFilters } from "./ProductFilters";
+import { ProductSortDropdown } from "./ProductSortDropdown";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Pagination } from "@/components/ui/Pagination";
 
 interface Props {
   initialProducts: Product[];
@@ -24,15 +24,23 @@ export function ProductCatalogView({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get('search') || '');
+  // Dynamic maximum price based on the actual catalog items
+  const maxPriceLimit = useMemo(() => {
+    if (initialProducts.length === 0) return 1000;
+    const highest = Math.max(...initialProducts.map((p) => p.price));
+    return Math.ceil(highest / 500) * 500 || 1000;
+  }, [initialProducts]);
+
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState<string>(
-    searchParams.get('category') || 'all'
+    searchParams.get("category") || "all",
   );
-  const [maxPrice, setMaxPrice] = useState<number>(
-    Number(searchParams.get('maxPrice')) || 1000
-  );
+  const [maxPrice, setMaxPrice] = useState<number>(() => {
+    const param = searchParams.get("maxPrice");
+    return param ? Number(param) : maxPriceLimit;
+  });
   const [minRating, setMinRating] = useState<number>(
-    Number(searchParams.get('minRating')) || 0
+    Number(searchParams.get("minRating")) || 0,
   );
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 8;
@@ -50,14 +58,22 @@ export function ProductCatalogView({
   // Sync state to URL search params
   useEffect(() => {
     const params = new URLSearchParams();
-    if (currentSort) params.set('sort', currentSort);
-    if (search.trim()) params.set('search', search.trim());
-    if (selectedCategory !== 'all') params.set('category', selectedCategory);
-    if (maxPrice < 1000) params.set('maxPrice', maxPrice.toString());
-    if (minRating > 0) params.set('minRating', minRating.toString());
+    if (currentSort) params.set("sort", currentSort);
+    if (search.trim()) params.set("search", search.trim());
+    if (selectedCategory !== "all") params.set("category", selectedCategory);
+    if (maxPrice < maxPriceLimit) params.set("maxPrice", maxPrice.toString());
+    if (minRating > 0) params.set("minRating", minRating.toString());
 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [search, selectedCategory, maxPrice, minRating, currentSort, pathname, router]);
+  }, [
+    search,
+    selectedCategory,
+    maxPrice,
+    minRating,
+    currentSort,
+    pathname,
+    router,
+  ]);
 
   // Multi-attribute client-side filtering
   const filteredProducts = useMemo(() => {
@@ -68,26 +84,33 @@ export function ProductCatalogView({
         product.description?.toLowerCase().includes(search.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === 'all' ||
+        selectedCategory === "all" ||
         product.category.toLowerCase() === selectedCategory.toLowerCase();
 
       const matchesPrice = product.price <= maxPrice;
       const rate =
-        typeof product.rating === 'object' && product.rating !== null
+        typeof product.rating === "object" && product.rating !== null
           ? product.rating.rate
           : Number(product.rating || 0);
       const matchesRating = rate >= minRating;
 
       return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     });
-  }, [initialProducts, search, selectedCategory, maxPrice, minRating]);
+  }, [
+    initialProducts,
+    search,
+    selectedCategory,
+    maxPrice,
+    maxPriceLimit,
+    minRating,
+  ]);
 
   // Active filters count
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (search.trim()) count++;
-    if (selectedCategory !== 'all') count++;
-    if (maxPrice < 1000) count++;
+    if (selectedCategory !== "all") count++;
+    if (maxPrice < maxPriceLimit) count++;
     if (minRating > 0) count++;
     return count;
   }, [search, selectedCategory, maxPrice, minRating]);
@@ -101,21 +124,21 @@ export function ProductCatalogView({
 
   const handleSortChange = (newSort: SortOrder) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('sort', newSort);
+    params.set("sort", newSort);
     router.push(`${pathname}?${params.toString()}`);
-    if (typeof window !== 'undefined' && window.scrollY > 0) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== "undefined" && window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handleResetFilters = () => {
-    setSearch('');
-    setSelectedCategory('all');
-    setMaxPrice(1000);
+    setSearch("");
+    setSelectedCategory("all");
+    setMaxPrice(maxPriceLimit);
     setMinRating(0);
     setCurrentPage(1);
-    if (typeof window !== 'undefined' && window.scrollY > 0) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== "undefined" && window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -125,7 +148,7 @@ export function ProductCatalogView({
       <div className="w-full bg-surface-container-lowest shadow-sm mb-space-lg border-b border-surface-container">
         <div className="max-w-7xl mx-auto px-margin py-space-md flex flex-wrap items-center justify-between gap-space-md">
           <div className="flex flex-wrap items-center gap-space-sm text-on-surface-variant">
-            <Breadcrumbs items={[{ label: 'Products' }]} />
+            <Breadcrumbs items={[{ label: "Products" }]} />
             <span className="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
             <div className="inline-flex items-center gap-1 text-xs bg-surface-container px-space-sm py-0.5 rounded-full text-on-surface font-medium">
               <span>Showing</span>
@@ -134,7 +157,7 @@ export function ProductCatalogView({
                   ? 0
                   : `${(currentPage - 1) * pageSize + 1}–${Math.min(
                       currentPage * pageSize,
-                      filteredProducts.length
+                      filteredProducts.length,
                     )}`}
               </span>
               <span>of {filteredProducts.length} items</span>
@@ -193,7 +216,8 @@ export function ProductCatalogView({
                   No Products Match Your Criteria
                 </h4>
                 <p className="text-xs text-outline mt-1.5 max-w-sm mx-auto">
-                  Try clearing your search query, increasing maximum price, or adjusting category filters.
+                  Try clearing your search query, increasing maximum price, or
+                  adjusting category filters.
                 </p>
                 <button
                   onClick={handleResetFilters}

@@ -1,14 +1,15 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
+import { Toaster } from "@/components/ui/Toast";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'V-STORE | Enterprise E-Commerce Dashboard',
-  description: 'Production-ready e-commerce dashboard built with Next.js and TypeScript',
+  title: "V-STORE | Enterprise E-Commerce Dashboard",
+  description:
+    "Production-ready e-commerce dashboard built with Next.js and TypeScript",
 };
 
 export default function RootLayout({
@@ -18,10 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-background text-on-surface antialiased flex flex-col min-h-screen`}>
-        <Header />
-        <div className="flex-1">{children}</div>
-        <Footer />
+      <body
+        className={`${inter.className} bg-background text-on-surface antialiased flex flex-col min-h-screen`}
+      >
+        <ConditionalLayout>{children}</ConditionalLayout>
+        <Toaster />
       </body>
     </html>
   );

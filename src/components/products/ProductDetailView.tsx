@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   ShoppingCart,
   Check,
@@ -10,12 +10,14 @@ import {
   Truck,
   ArrowLeft,
   RotateCcw,
-} from 'lucide-react';
-import { Product } from '@/types';
-import { useCartStore } from '@/stores/cart-store';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { RatingStars } from '@/components/ui/RatingStars';
-import { QuantityStepper } from '@/components/ui/QuantityStepper';
+} from "lucide-react";
+import { Product } from "@/types";
+import { useCartStore } from "@/stores/cart-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "@/stores/toast-store";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { RatingStars } from "@/components/ui/RatingStars";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
 
 interface Props {
   product: Product;
@@ -25,11 +27,16 @@ export function ProductDetailView({ product }: Props) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>(
-    product.image || product.thumbnail || ''
+    product.image || product.thumbnail || "",
   );
   const addItem = useCartStore((state) => state.addItem);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.error("You should be logged in to add items to cart");
+      return;
+    }
     addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -38,15 +45,15 @@ export function ProductDetailView({ product }: Props) {
   const images =
     product.images && product.images.length > 0
       ? product.images
-      : [product.image || product.thumbnail || ''];
+      : [product.image || product.thumbnail || ""];
 
   const rate =
-    typeof product.rating === 'object' && product.rating !== null
+    typeof product.rating === "object" && product.rating !== null
       ? product.rating.rate
       : Number(product.rating || 0);
 
   const count =
-    typeof product.rating === 'object' && product.rating !== null
+    typeof product.rating === "object" && product.rating !== null
       ? product.rating.count
       : product.reviews?.length || 0;
 
@@ -56,7 +63,7 @@ export function ProductDetailView({ product }: Props) {
       <div className="mb-space-lg">
         <Breadcrumbs
           items={[
-            { label: 'Products', href: '/products' },
+            { label: "Products", href: "/products" },
             { label: product.title },
           ]}
         />
@@ -79,7 +86,7 @@ export function ProductDetailView({ product }: Props) {
               <span className="text-outline text-sm">No Image</span>
             )}
             <span className="absolute top-4 left-4 z-10 text-[11px] leading-[14px] bg-secondary text-on-secondary px-2.5 py-1 rounded font-bold uppercase tracking-wider">
-              {product.availabilityStatus || 'In Stock'}
+              {product.availabilityStatus || "In Stock"}
             </span>
           </div>
 
@@ -92,8 +99,8 @@ export function ProductDetailView({ product }: Props) {
                   type="button"
                   className={`relative w-16 h-16 rounded-lg bg-surface-container-low overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
                     selectedImage === img
-                      ? 'border-primary ring-2 ring-primary/20'
-                      : 'border-transparent hover:border-outline-variant'
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-transparent hover:border-outline-variant"
                   }`}
                 >
                   <Image
@@ -118,7 +125,8 @@ export function ProductDetailView({ product }: Props) {
               </span>
               {product.brand && (
                 <span className="text-xs text-on-surface-variant font-medium">
-                  Brand: <strong className="text-on-surface">{product.brand}</strong>
+                  Brand:{" "}
+                  <strong className="text-on-surface">{product.brand}</strong>
                 </span>
               )}
             </div>
@@ -160,20 +168,24 @@ export function ProductDetailView({ product }: Props) {
             <div className="grid grid-cols-2 gap-space-sm pt-space-xs text-xs text-on-surface-variant">
               <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low">
                 <Truck className="w-4 h-4 text-primary shrink-0" />
-                <span>{product.shippingInformation || 'Free Express Delivery'}</span>
+                <span>
+                  {product.shippingInformation || "Free Express Delivery"}
+                </span>
               </div>
               <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low">
                 <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-                <span>{product.warrantyInformation || '1-Year Warranty'}</span>
+                <span>{product.warrantyInformation || "1-Year Warranty"}</span>
               </div>
               <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low">
                 <RotateCcw className="w-4 h-4 text-primary shrink-0" />
-                <span>{product.returnPolicy || '30-Day Money Back'}</span>
+                <span>{product.returnPolicy || "30-Day Money Back"}</span>
               </div>
               {product.sku && (
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low">
                   <span className="text-outline font-semibold">SKU:</span>
-                  <span className="font-mono text-[11px] truncate">{product.sku}</span>
+                  <span className="font-mono text-[11px] truncate">
+                    {product.sku}
+                  </span>
                 </div>
               )}
             </div>
@@ -193,8 +205,8 @@ export function ProductDetailView({ product }: Props) {
               onClick={handleAddToCart}
               className={`w-full sm:flex-1 py-3 px-space-lg font-semibold rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all text-sm cursor-pointer ${
                 added
-                  ? 'bg-secondary text-on-secondary'
-                  : 'bg-primary hover:bg-primary-container text-on-primary'
+                  ? "bg-secondary text-on-secondary"
+                  : "bg-primary hover:bg-primary-container text-on-primary"
               }`}
             >
               {added ? (
@@ -203,7 +215,8 @@ export function ProductDetailView({ product }: Props) {
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="w-4 h-4" /> Add to Cart (${(product.price * quantity).toFixed(2)})
+                  <ShoppingCart className="w-4 h-4" /> Add to Cart ($
+                  {(product.price * quantity).toFixed(2)})
                 </>
               )}
             </button>
