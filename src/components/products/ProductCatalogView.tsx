@@ -41,7 +41,7 @@ export function ProductCatalogView({
   // Local state for the search input for responsive typing
   const [search, setSearch] = useState(urlSearch);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 8;
+  const pageSize = 9;
 
   // Keep local search input in sync if URL search param changes (e.g. from Header search or reset)
   useEffect(() => {
@@ -65,7 +65,7 @@ export function ProductCatalogView({
 
   // Centralized URL updater that preserves all active query parameters
   const updateUrlParam = (
-    updates: Record<string, string | number | null | undefined>
+    updates: Record<string, string | number | null | undefined>,
   ) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -192,7 +192,7 @@ export function ProductCatalogView({
                   ? 0
                   : `${(currentPage - 1) * pageSize + 1}–${Math.min(
                       currentPage * pageSize,
-                      filteredProducts.length
+                      filteredProducts.length,
                     )}`}
               </span>
               <span>of {filteredProducts.length} items</span>
