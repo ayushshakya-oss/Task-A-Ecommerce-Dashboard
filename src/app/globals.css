@@ -1,26 +1,64 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-outline-variant: #c7c4d8;
+  --color-surface-variant: #dae2fd;
+  --color-tertiary: #3a495f;
+  --color-surface-tint: #4d44e3;
+  --color-primary-fixed: #e2dfff;
+  --color-surface-bright: #faf8ff;
+  --color-secondary: #006c49;
+  --color-on-tertiary-fixed: #0b1c30;
+  --color-inverse-on-surface: #eef0ff;
+  --color-on-primary-container: #dad7ff;
+  --color-inverse-surface: #283044;
+  --color-on-error: #ffffff;
+  --color-on-background: #131b2e;
+  --color-secondary-fixed: #6ffbbe;
+  --color-tertiary-fixed-dim: #b7c8e1;
+  --color-on-primary-fixed-variant: #3323cc;
+  --color-surface-container-low: #f2f3ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-inverse-primary: #c3c0ff;
+  --color-error: #ba1a1a;
+  --color-on-secondary-fixed: #002113;
+  --color-error-container: #ffdad6;
+  --color-primary-fixed-dim: #c3c0ff;
+  --color-on-secondary-container: #00714d;
+  --color-surface-container: #eaedff;
+  --color-outline: #777587;
+  --color-on-primary: #ffffff;
+  --color-on-surface: #131b2e;
+  --color-primary: #3525cd;
+  --color-background: #faf8ff;
+  --color-secondary-container: #6cf8bb;
+  --color-surface: #faf8ff;
+  --color-on-secondary-fixed-variant: #005236;
+  --color-surface-container-highest: #dae2fd;
+  --color-surface-dim: #d2d9f4;
+  --color-on-tertiary-fixed-variant: #38485d;
+  --color-tertiary-fixed: #d3e4fe;
+  --color-tertiary-container: #516177;
+  --color-primary-container: #4f46e5;
+  --color-on-surface-variant: #464555;
+  --color-on-tertiary-container: #ccdcf7;
+  --color-on-primary-fixed: #0f0069;
+  --color-on-error-container: #93000a;
+  --color-on-tertiary: #ffffff;
+  --color-on-secondary: #ffffff;
+  --color-secondary-fixed-dim: #4edea3;
+  --color-surface-container-high: #e2e7ff;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2rem;
+  --spacing-margin: 2rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
 }
