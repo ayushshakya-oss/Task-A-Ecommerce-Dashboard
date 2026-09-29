@@ -3,8 +3,18 @@ import { ComingSoonView } from '@/components/ui/ComingSoonView';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Categories Coming Soon | V-STORE',
-  description: 'Explore categorized product collections coming soon.',
+  title: 'Category Directory',
+  description:
+    'Explore curated product collections, hierarchical tagging, and category directories coming soon on V-STORE.',
+  openGraph: {
+    title: 'Category Directory | V-STORE',
+    description: 'Explore curated product collections and category directories on V-STORE.',
+    url: '/categories',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/categories',
+  },
 };
 
 export default function CategoriesPage() {

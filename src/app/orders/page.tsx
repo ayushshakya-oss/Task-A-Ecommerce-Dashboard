@@ -3,8 +3,18 @@ import { ComingSoonView } from '@/components/ui/ComingSoonView';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Order Tracking Coming Soon | V-STORE',
-  description: 'Live order tracking and fulfillment history coming soon.',
+  title: 'Order Tracking & History',
+  description:
+    'Live parcel dispatch milestones, tax invoices, and shipment tracking features coming soon to V-STORE.',
+  openGraph: {
+    title: 'Order Tracking & History | V-STORE',
+    description: 'Track your shipments and order history on V-STORE.',
+    url: '/orders',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/orders',
+  },
 };
 
 export default function OrdersPage() {

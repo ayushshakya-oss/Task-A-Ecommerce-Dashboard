@@ -3,8 +3,18 @@ import { ComingSoonView } from '@/components/ui/ComingSoonView';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Deals & Discounts Coming Soon | V-STORE',
-  description: 'Exclusive flash sales, discount coupons, and daily deals coming soon.',
+  title: 'Flash Deals & Discounts',
+  description:
+    'Exclusive flash sales, discount coupons, clearance specials, and daily deals coming soon to V-STORE.',
+  openGraph: {
+    title: 'Flash Deals & Discounts | V-STORE',
+    description: 'Exclusive flash sales, discount coupons, and daily deals coming soon.',
+    url: '/deals',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/deals',
+  },
 };
 
 export default function DealsPage() {
