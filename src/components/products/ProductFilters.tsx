@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, RotateCcw, Star, X } from 'lucide-react';
 
 interface ProductFiltersProps {
@@ -42,6 +42,13 @@ export function ProductFilters({
   onClose,
   resultsCount,
 }: ProductFiltersProps) {
+  // Local state for smooth slider dragging without premature router or scroll triggers
+  const [localPrice, setLocalPrice] = useState<number>(maxPrice);
+
+  useEffect(() => {
+    setLocalPrice(maxPrice);
+  }, [maxPrice]);
+
   const scrollToTopIfNeeded = () => {
     if (typeof window !== 'undefined' && window.scrollY > 0) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -60,9 +67,15 @@ export function ProductFilters({
     }
   };
 
-  const handlePriceChange = (price: number) => {
-    onMaxPriceChange(price);
-    scrollToTopIfNeeded();
+  const handleSliderDrag = (price: number) => {
+    setLocalPrice(price);
+  };
+
+  const handleSliderCommit = () => {
+    if (localPrice !== maxPrice) {
+      onMaxPriceChange(localPrice);
+      scrollToTopIfNeeded();
+    }
   };
 
   const handleRatingSelect = (rating: number) => {
@@ -73,6 +86,7 @@ export function ProductFilters({
   };
 
   const handleReset = () => {
+    setLocalPrice(maxPriceLimit);
     onResetFilters();
     scrollToTopIfNeeded();
   };
@@ -177,8 +191,8 @@ export function ProductFilters({
           <span className="text-xs font-semibold text-on-surface uppercase tracking-wide">
             Price Range
           </span>
-          <span className="text-xs text-primary font-bold bg-primary-fixed px-2 py-0.5 rounded-md">
-            {maxPrice >= maxPriceLimit ? 'All Prices' : `Up to $${maxPrice}`}
+          <span className="text-xs text-primary font-bold bg-primary-fixed px-2 py-0.5 rounded-md transition-all">
+            {localPrice >= maxPriceLimit ? 'All Prices' : `Up to $${localPrice}`}
           </span>
         </div>
         <input
@@ -186,9 +200,27 @@ export function ProductFilters({
           min="10"
           max={maxPriceLimit}
           step={maxPriceLimit > 2000 ? 50 : 10}
-          value={maxPrice}
-          onChange={(e) => handlePriceChange(Number(e.target.value))}
-          className="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer accent-primary"
+          value={localPrice}
+          onChange={(e) => handleSliderDrag(Number(e.target.value))}
+          onPointerUp={handleSliderCommit}
+          onTouchEnd={handleSliderCommit}
+          onKeyUp={(e) => {
+            if (
+              [
+                'ArrowLeft',
+                'ArrowRight',
+                'ArrowUp',
+                'ArrowDown',
+                'PageUp',
+                'PageDown',
+                'Home',
+                'End',
+              ].includes(e.key)
+            ) {
+              handleSliderCommit();
+            }
+          }}
+          className="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-grab active:cursor-grabbing accent-primary"
         />
         <div className="flex justify-between text-[11px] text-on-surface-variant font-medium">
           <span>$10</span>
