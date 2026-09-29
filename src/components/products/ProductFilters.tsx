@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, Filter, RotateCcw, Star } from 'lucide-react';
+import { Search, Filter, RotateCcw, Star, X } from 'lucide-react';
 
 interface ProductFiltersProps {
   search: string;
@@ -19,6 +19,8 @@ interface ProductFiltersProps {
   activeFiltersCount: number;
   onResetFilters: () => void;
   className?: string;
+  onClose?: () => void;
+  resultsCount?: number;
 }
 
 export function ProductFilters({
@@ -37,6 +39,8 @@ export function ProductFilters({
   activeFiltersCount,
   onResetFilters,
   className = '',
+  onClose,
+  resultsCount,
 }: ProductFiltersProps) {
   const scrollToTopIfNeeded = () => {
     if (typeof window !== 'undefined' && window.scrollY > 0) {
@@ -77,14 +81,26 @@ export function ProductFilters({
     <aside
       className={`w-full lg:w-[280px] shrink-0 bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col gap-space-lg border border-surface-container-high/50 ${className}`}
     >
-      <div className="flex items-center justify-between pb-space-sm border-b border-surface-container">
+      <div className="flex items-center justify-between pb-space-sm border-b border-surface-container shrink-0">
         <div className="flex items-center gap-1.5">
           <Filter className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-bold text-on-surface">Filters</h3>
         </div>
-        <span className="text-[11px] bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded-full font-semibold">
-          Active: {activeFiltersCount}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded-full font-semibold">
+            Active: {activeFiltersCount}
+          </span>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+              aria-label="Close filters"
+              type="button"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filter Search Input */}
@@ -104,7 +120,7 @@ export function ProductFilters({
         <span className="text-xs font-semibold text-on-surface uppercase tracking-wide">
           Category
         </span>
-        <div className="space-y-1">
+        <div className="max-h-60 overflow-y-auto pr-1 space-y-1">
           <label className="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors group">
             <div className="flex items-center gap-2">
               <input
@@ -238,12 +254,22 @@ export function ProductFilters({
       {/* Clear / Reset Filter Action */}
       <button
         onClick={handleReset}
-        className="w-full py-2 flex items-center justify-center gap-1.5 text-on-surface-variant hover:text-error text-xs font-medium rounded-lg hover:bg-error-container/20 transition-all cursor-pointer"
+        className="w-full py-2 flex items-center justify-center gap-1.5 text-on-surface-variant hover:text-error text-xs font-medium rounded-lg hover:bg-error-container/20 transition-all cursor-pointer shrink-0"
         type="button"
       >
         <RotateCcw className="w-3.5 h-3.5" />
         <span>Reset All Filters</span>
       </button>
+
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="w-full py-2.5 bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 mt-1"
+          type="button"
+        >
+          <span>View {resultsCount ?? totalProductsCount} Products</span>
+        </button>
+      )}
     </aside>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { Filter } from "lucide-react";
 import { Product, SortOrder } from "@/types";
 import { ProductCard } from "./ProductCard";
 import { ProductFilters } from "./ProductFilters";
@@ -31,7 +32,7 @@ export function ProductCatalogView({
     return Math.ceil(highest / 500) * 500 || 1000;
   }, [initialProducts]);
 
-  // Single Source of Truth: URL Search Params
+  // URL Search Params
   const selectedCategory = searchParams.get("category") || "all";
   const urlSearch = searchParams.get("search") || "";
   const maxPriceParam = searchParams.get("maxPrice");
@@ -41,17 +42,49 @@ export function ProductCatalogView({
   // Local state for the search input for responsive typing
   const [search, setSearch] = useState(urlSearch);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 9;
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  // Dynamic pageSize: 8 items for <= 1280px, 9 items for > 1280px
+  const [pageSize, setPageSize] = useState<number>(9);
 
-  // Keep local search input in sync if URL search param changes (e.g. from Header search or reset)
   useEffect(() => {
     setSearch(urlSearch);
   }, [urlSearch]);
 
-  // Reset page to 1 whenever any filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, urlSearch, maxPriceParam, minRating, currentSort]);
+
+  useEffect(() => {
+    if (isMobileFiltersOpen) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setIsMobileFiltersOpen(false);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [isMobileFiltersOpen]);
+
+  // mobile drawer auto-close and responsive pageSize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileFiltersOpen(false);
+      }
+      setPageSize(window.innerWidth <= 1280 ? 8 : 9);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Compute category item counts from initial products
   const categoryCounts = useMemo(() => {
@@ -63,7 +96,7 @@ export function ProductCatalogView({
     return counts;
   }, [initialProducts]);
 
-  // Centralized URL updater that preserves all active query parameters
+  // URL updater  preserves all active query parameters
   const updateUrlParam = (
     updates: Record<string, string | number | null | undefined>,
   ) => {
@@ -177,6 +210,13 @@ export function ProductCatalogView({
     return filteredProducts.slice(start, start + pageSize);
   }, [filteredProducts, currentPage, pageSize]);
 
+  // Ensure currentPage does not exceed totalPages if pageSize changes on screen resize
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(Math.max(1, totalPages));
+    }
+  }, [totalPages, currentPage]);
+
   return (
     <div className="w-full">
       {/* Sub-Header Status & Breadcrumbs Bar */}
@@ -199,10 +239,28 @@ export function ProductCatalogView({
             </div>
           </div>
 
-          <ProductSortDropdown
-            currentSort={currentSort}
-            onSortChange={handleSortChange}
-          />
+          <div className="flex items-center gap-space-sm">
+            {/* Filter Drawer Toggle Button for < 1024px */}
+            <button
+              onClick={() => setIsMobileFiltersOpen(true)}
+              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-surface-container bg-surface-container-low hover:bg-surface-container text-xs font-semibold text-on-surface transition-all cursor-pointer shadow-xs active:scale-95"
+              type="button"
+              aria-label="Open product filters"
+            >
+              <Filter className="w-3.5 h-3.5 text-primary" />
+              <span>Filters</span>
+              {activeFiltersCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+
+            <ProductSortDropdown
+              currentSort={currentSort}
+              onSortChange={handleSortChange}
+            />
+          </div>
         </div>
       </div>
 
@@ -224,6 +282,7 @@ export function ProductCatalogView({
             onMinRatingChange={handleMinRatingChange}
             activeFiltersCount={activeFiltersCount}
             onResetFilters={handleResetFilters}
+            className="hidden lg:flex"
           />
 
           {/* Product Grid & Pagination */}
@@ -260,6 +319,46 @@ export function ProductCatalogView({
           </div>
         </div>
       </div>
+
+      {/* Mobile Filter Slide-Over Drawer (< 1024px) */}
+      {isMobileFiltersOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden flex"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Filter products"
+        >
+          {/* Backdrop with fade-in and blur */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
+            onClick={() => setIsMobileFiltersOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Slide-over Drawer Panel */}
+          <div className="relative w-full max-w-[320px] sm:max-w-sm h-full bg-surface-container-lowest shadow-2xl flex flex-col z-10 overflow-y-auto">
+            <ProductFilters
+              search={search}
+              onSearchChange={handleSearchChange}
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              categories={categories}
+              categoryCounts={categoryCounts}
+              totalProductsCount={initialProducts.length}
+              maxPrice={maxPrice}
+              maxPriceLimit={maxPriceLimit}
+              onMaxPriceChange={handleMaxPriceChange}
+              minRating={minRating}
+              onMinRatingChange={handleMinRatingChange}
+              activeFiltersCount={activeFiltersCount}
+              onResetFilters={handleResetFilters}
+              className="w-full h-full border-none rounded-none shadow-none"
+              onClose={() => setIsMobileFiltersOpen(false)}
+              resultsCount={filteredProducts.length}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
