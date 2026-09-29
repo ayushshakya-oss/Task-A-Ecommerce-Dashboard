@@ -2,19 +2,34 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ChevronDown,
-  User,
+  User as UserIcon,
   Package,
   Heart,
-  Settings,
   LogOut,
   ShieldCheck,
+  LogIn,
 } from 'lucide-react';
+import { useAuthStore } from '@/stores/auth-store';
+import { toast } from '@/stores/toast-store';
+import { Button } from '@/components/ui/Button';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { Badge } from '@/components/ui/Badge';
+import { DropdownMenuItem } from './DropdownMenuItem';
 
 export function UserProfileDropdown() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { user, isAuthenticated, logout } = useAuthStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -31,6 +46,37 @@ export function UserProfileDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleLogout = () => {
+    setIsOpen(false);
+    logout();
+    toast.info('You have signed out successfully.');
+    router.push('/products');
+  };
+
+  // Prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="w-8 h-8 rounded-full bg-surface-container-highest animate-pulse" />
+    );
+  }
+
+  // Not authenticated: Show Sign In button
+  if (!isAuthenticated || !user) {
+    return (
+      <Link href="/login">
+        <Button
+          variant="surface"
+          size="md"
+          leftIcon={<LogIn className="w-3.5 h-3.5 text-primary" />}
+        >
+          Sign In
+        </Button>
+      </Link>
+    );
+  }
+
+  const fullName = `${user.firstName} ${user.lastName}`;
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Profile Trigger Button */}
@@ -41,14 +87,17 @@ export function UserProfileDropdown() {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <div className="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-xs font-bold text-primary shrink-0 ring-1 ring-primary/20">
-          AM
-        </div>
+        <UserAvatar
+          src={user.image}
+          name={fullName}
+          size="sm"
+          ringColor="ring-primary/20"
+        />
         <div className="hidden lg:flex flex-col text-left">
-          <span className="text-xs font-semibold text-on-surface leading-tight">
-            Alex M.
+          <span className="text-xs font-semibold text-on-surface leading-tight truncate max-w-[100px]">
+            {user.firstName}
           </span>
-          <span className="text-[10px] text-on-surface-variant">Verified Buyer</span>
+          <span className="text-[10px] text-secondary font-medium">Signed In</span>
         </div>
         <ChevronDown
           className={`w-3.5 h-3.5 text-on-surface-variant transition-transform duration-200 ${
@@ -62,78 +111,61 @@ export function UserProfileDropdown() {
         <div className="absolute right-0 mt-2 w-64 rounded-xl bg-surface-container-lowest shadow-xl border border-surface-container z-50 p-2 animate-in fade-in zoom-in-95 duration-100">
           {/* User Info Header */}
           <div className="p-3 bg-surface-container-low rounded-lg mb-2 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-on-primary shrink-0">
-              AM
-            </div>
+            <UserAvatar
+              src={user.image}
+              name={fullName}
+              size="md"
+              ringColor="ring-2 ring-primary-fixed"
+            />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-on-surface truncate">
-                  Alex Mitchell
+                  {fullName}
                 </span>
                 <ShieldCheck className="w-3.5 h-3.5 text-secondary shrink-0" />
               </div>
               <p className="text-[11px] text-on-surface-variant truncate">
-                alex.m@example.com
+                {user.email}
               </p>
-              <span className="inline-block mt-1 text-[10px] font-semibold text-secondary bg-surface-container px-1.5 py-0.2 rounded">
-                Verified Buyer
-              </span>
+              <Badge variant="surface" className="mt-1">
+                @{user.username}
+              </Badge>
             </div>
           </div>
 
           {/* Navigation Links */}
           <div className="space-y-0.5 text-xs">
-            <Link
-              href="#"
+            <DropdownMenuItem
+              href="/profile"
+              icon={<UserIcon className="w-4 h-4" />}
+              label="My Profile"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-medium"
-            >
-              <User className="w-4 h-4 text-outline" />
-              <span>My Profile</span>
-            </Link>
+            />
 
-            <Link
-              href="#"
+            <DropdownMenuItem
+              href="/cart"
+              icon={<Package className="w-4 h-4" />}
+              label="Shopping Cart"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-medium"
-            >
-              <Package className="w-4 h-4 text-outline" />
-              <span>Orders & Tracking</span>
-            </Link>
+            />
 
-            <Link
-              href="#"
+            <DropdownMenuItem
+              href="/products"
+              icon={<Heart className="w-4 h-4" />}
+              label="Browse Catalog"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-medium"
-            >
-              <Heart className="w-4 h-4 text-outline" />
-              <span>Wishlist</span>
-            </Link>
-
-            <Link
-              href="#"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-on-surface hover:bg-surface-container-low transition-colors font-medium"
-            >
-              <Settings className="w-4 h-4 text-outline" />
-              <span>Account Settings</span>
-            </Link>
+            />
           </div>
 
           <div className="h-px bg-surface-container my-1.5" />
 
           {/* Sign Out Action */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              // placeholder sign-out handler
-            }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-error hover:bg-error-container/20 transition-colors text-xs font-semibold cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </button>
+          <DropdownMenuItem
+            icon={<LogOut className="w-4 h-4" />}
+            label="Sign Out"
+            onClick={handleLogout}
+            isDanger
+          />
         </div>
       )}
     </div>

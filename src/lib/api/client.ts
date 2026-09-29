@@ -1,4 +1,4 @@
-import { Product, Rating, SortOrder } from "@/types";
+import { AuthResponse, LoginCredentials, Product, Rating, SortOrder, User } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://dummyjson.com";
 
@@ -150,5 +150,30 @@ export const api = {
     }
 
     return [];
+  },
+
+  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    return apiClient<AuthResponse>("/user/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+      cache: "no-store",
+    });
+  },
+
+  getCurrentUser: async (accessToken: string): Promise<User> => {
+    return apiClient<User>("/user/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+    });
+  },
+
+  getUserById: async (id: number | string): Promise<User> => {
+    return apiClient<User>(`/users/${id}`, {
+      method: "GET",
+      cache: "no-store",
+    });
   },
 };

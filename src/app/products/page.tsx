@@ -1,7 +1,7 @@
-import { Suspense } from 'react';
-import { api } from '@/lib/api/client';
-import { SortOrder } from '@/types';
-import { ProductCatalogView } from '@/components/products/ProductCatalogView';
+import { Suspense } from "react";
+import { api } from "@/lib/api/client";
+import { SortOrder } from "@/types";
+import { ProductCatalogView } from "@/components/products/ProductCatalogView";
 
 interface PageProps {
   searchParams: Promise<{
@@ -11,7 +11,7 @@ interface PageProps {
 
 export default async function ProductsPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
-  const sort = resolvedParams.sort === 'desc' ? 'desc' : 'asc';
+  const sort = resolvedParams.sort === "desc" ? "desc" : "asc";
 
   const [products, categories] = await Promise.all([
     api.getProducts(sort),
@@ -19,7 +19,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <main className="min-h-screen bg-background pt-6">
+    <main className="min-h-screen bg-background">
       <Suspense
         fallback={
           <div className="max-w-7xl mx-auto px-margin py-12 text-center text-on-surface-variant text-sm">

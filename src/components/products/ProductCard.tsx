@@ -1,33 +1,40 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ShoppingCart, Check } from 'lucide-react';
-import { Product } from '@/types';
-import { useCartStore } from '@/stores/cart-store';
-import { RatingStars } from '@/components/ui/RatingStars';
-import { QuantityStepper } from '@/components/ui/QuantityStepper';
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ShoppingCart, Check } from "lucide-react";
+import { Product } from "@/types";
+import { useCartStore } from "@/stores/cart-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "@/stores/toast-store";
+import { RatingStars } from "@/components/ui/RatingStars";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
 
 export function ProductCard({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.error("You should be logged in to add items to cart");
+      return;
+    }
     addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
 
-  const imageUrl = product.image || product.thumbnail || '';
+  const imageUrl = product.image || product.thumbnail || "";
   const rate =
-    typeof product.rating === 'object' && product.rating !== null
+    typeof product.rating === "object" && product.rating !== null
       ? product.rating.rate
       : Number(product.rating || 0);
 
   const count =
-    typeof product.rating === 'object' && product.rating !== null
+    typeof product.rating === "object" && product.rating !== null
       ? product.rating.count
       : product.reviews?.length || 0;
 
@@ -86,18 +93,14 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-space-md pt-space-sm flex items-center gap-space-xs">
-          <QuantityStepper
-            value={quantity}
-            onChange={setQuantity}
-            size="sm"
-          />
+          <QuantityStepper value={quantity} onChange={setQuantity} size="sm" />
 
           <button
             onClick={handleAddToCart}
             className={`flex-1 py-2 px-space-sm font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all text-xs cursor-pointer ${
               added
-                ? 'bg-secondary text-on-secondary'
-                : 'bg-primary-container hover:bg-primary text-on-primary'
+                ? "bg-secondary text-on-secondary"
+                : "bg-primary-container hover:bg-primary text-on-primary"
             }`}
             type="button"
           >

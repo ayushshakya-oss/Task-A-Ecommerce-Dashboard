@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useCartStore } from '@/stores/cart-store';
 import { api } from '@/lib/api/client';
 import { PromoBanner } from './PromoBanner';
@@ -13,6 +13,7 @@ import { UserProfileDropdown } from './UserProfileDropdown';
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [headerSearch, setHeaderSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -48,6 +49,20 @@ export function Header() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const isNavActive = (href: string) => {
+    if (href === '/products') {
+      return pathname === '/' || pathname.startsWith('/products');
+    }
+    return pathname === href;
+  };
+
+  const navLinks = [
+    { label: 'Catalog', href: '/products' },
+    { label: 'Categories', href: '/categories' },
+    { label: 'Deals', href: '/deals' },
+    { label: 'Orders', href: '/orders' },
+  ];
+
   return (
     <header className="sticky top-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container">
       {/* Top Notification Banner */}
@@ -60,30 +75,22 @@ export function Header() {
           <BrandLogo />
 
           <nav className="hidden xl:flex items-center gap-1">
-            <Link
-              className="px-space-md py-space-sm bg-primary-container text-on-primary font-semibold rounded-lg text-xs transition-all"
-              href="/products"
-            >
-              Catalog
-            </Link>
-            <Link
-              className="px-space-md py-space-sm rounded-lg text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all"
-              href="/products"
-            >
-              Categories
-            </Link>
-            <Link
-              className="px-space-md py-space-sm rounded-lg text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all"
-              href="#"
-            >
-              Deals
-            </Link>
-            <Link
-              className="px-space-md py-space-sm rounded-lg text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all"
-              href="#"
-            >
-              Orders
-            </Link>
+            {navLinks.map((link) => {
+              const active = isNavActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-space-md py-space-sm rounded-lg text-xs transition-all ${
+                    active
+                      ? 'bg-primary-container text-on-primary font-semibold shadow-sm'
+                      : 'font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 

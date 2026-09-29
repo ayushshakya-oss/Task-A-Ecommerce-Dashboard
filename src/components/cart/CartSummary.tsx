@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { ShieldCheck, CheckCircle2 } from 'lucide-react';
+import React from "react";
+import { ShieldCheck, CheckCircle2 } from "lucide-react";
 
 interface CartSummaryProps {
   subtotal: number;
@@ -18,7 +18,7 @@ export function CartSummary({
   tax,
   orderTotal,
   onCheckout,
-  className = '',
+  className = "",
 }: CartSummaryProps) {
   return (
     <div
@@ -29,17 +29,21 @@ export function CartSummary({
       <div className="space-y-2 text-xs text-on-surface-variant border-b border-surface-container pb-space-md">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span className="font-semibold text-on-surface">${subtotal.toFixed(2)}</span>
+          <span className="font-semibold text-on-surface">
+            ${subtotal.toFixed(2)}
+          </span>
         </div>
         <div className="flex justify-between">
           <span>Estimated Shipping</span>
           <span className="font-semibold text-secondary">
-            {shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}
+            {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
           </span>
         </div>
         <div className="flex justify-between">
           <span>Estimated Tax (8%)</span>
-          <span className="font-semibold text-on-surface">${tax.toFixed(2)}</span>
+          <span className="font-semibold text-on-surface">
+            ${tax.toFixed(2)}
+          </span>
         </div>
       </div>
 
@@ -55,11 +59,6 @@ export function CartSummary({
       >
         <CheckCircle2 className="w-4 h-4" /> Proceed to Checkout
       </button>
-
-      <div className="pt-space-sm flex items-center justify-center gap-2 text-[11px] text-on-surface-variant">
-        <ShieldCheck className="w-4 h-4 text-secondary" />
-        <span>PCI-DSS Level 1 Encrypted Checkout</span>
-      </div>
     </div>
   );
 }
