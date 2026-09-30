@@ -103,7 +103,7 @@ export const api = {
     const params = new URLSearchParams();
     params.set("limit", "0"); // Fetch complete catalog so sorting never truncates items
     if (sort) {
-      params.set("sortBy", "id");
+      params.set("sortBy", "price");
       params.set("order", sort);
     }
     const query = params.toString() ? `?${params.toString()}` : "";

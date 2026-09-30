@@ -23,9 +23,10 @@ export function CartItemRow({
 
   return (
     <div
-      className={`p-space-md sm:p-space-lg flex flex-col sm:flex-row items-center gap-space-md ${className}`}
+      className={`p-3 sm:p-space-lg flex gap-3 sm:gap-space-md sm:items-center ${className}`}
     >
-      <div className="relative w-20 h-20 bg-surface-container-low rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-2 border border-surface-container">
+      {/* Product Image Thumbnail */}
+      <div className="relative w-20 h-20 bg-surface-container-low rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-2 border border-surface-container self-start sm:self-auto">
         {img ? (
           <Image
             src={img}
@@ -39,42 +40,67 @@ export function CartItemRow({
         )}
       </div>
 
-      <div className="flex-1 w-full text-center sm:text-left">
-        <span className="text-[10px] bg-primary-fixed text-primary px-2 py-0.5 rounded-full font-semibold uppercase">
-          {item.category}
-        </span>
-        <h3 className="text-xs sm:text-sm font-semibold text-on-surface line-clamp-1 mt-1">
-          {item.title}
-        </h3>
-        <div className="text-xs text-on-surface-variant font-medium mt-0.5">
-          ${item.price.toFixed(2)} each
+      {/* Content Area: Horizontal grid / flex on mobile & single row on desktop */}
+      <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-space-md justify-between">
+        {/* Info Header: Category, Title, Price, and Mobile Trash */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="inline-block text-[10px] bg-primary-fixed text-primary px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">
+                {item.category}
+              </span>
+              <h3 className="text-xs sm:text-sm font-semibold text-on-surface line-clamp-1 mt-1">
+                {item.title}
+              </h3>
+            </div>
+
+            {/* Mobile Remove Button */}
+            <button
+              type="button"
+              onClick={() => onRemove(item.id)}
+              className="sm:hidden text-outline hover:text-error transition-colors p-1 rounded-lg hover:bg-error-container/20 cursor-pointer shrink-0"
+              aria-label={`Remove ${item.title} from cart`}
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="text-xs text-on-surface-variant font-medium mt-0.5">
+            ${item.price.toFixed(2)} each
+          </div>
+        </div>
+
+        {/* Stepper, Total, and Desktop Remove Button */}
+        <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-space-md mt-1 sm:mt-0 pt-2 sm:pt-0 border-t border-surface-container/50 sm:border-t-0">
+          {/* Quantity Stepper */}
+          <QuantityStepper
+            value={item.quantity}
+            onChange={(newQ) => onUpdateQuantity(item.id, newQ)}
+            min={1}
+            size="sm"
+          />
+
+          {/* Item Total */}
+          <div className="text-right shrink-0 min-w-[70px]">
+            <div className="text-[10px] text-on-surface-variant font-medium sm:hidden">
+              Total
+            </div>
+            <div className="text-sm font-bold text-on-surface">
+              ${(item.price * item.quantity).toFixed(2)}
+            </div>
+          </div>
+
+          {/* Desktop Remove Button */}
+          <button
+            type="button"
+            onClick={() => onRemove(item.id)}
+            className="hidden sm:inline-flex text-outline hover:text-error transition-colors p-1.5 rounded-lg hover:bg-error-container/20 cursor-pointer shrink-0"
+            aria-label={`Remove ${item.title} from cart`}
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
-
-      {/* Quantity Stepper */}
-      <QuantityStepper
-        value={item.quantity}
-        onChange={(newQ) => onUpdateQuantity(item.id, newQ)}
-        min={1}
-        size="sm"
-      />
-
-      {/* Item Total */}
-      <div className="text-right shrink-0 min-w-[70px]">
-        <div className="text-sm font-bold text-on-surface">
-          ${(item.price * item.quantity).toFixed(2)}
-        </div>
-      </div>
-
-      {/* Remove Button */}
-      <button
-        type="button"
-        onClick={() => onRemove(item.id)}
-        className="text-outline hover:text-error transition-colors p-1.5 rounded-lg hover:bg-error-container/20 cursor-pointer"
-        aria-label={`Remove ${item.title} from cart`}
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
     </div>
   );
 }

@@ -1,8 +1,8 @@
-import React from 'react';
-import Link from 'next/link';
-import { BrandLogo } from '@/components/ui/BrandLogo';
-import { NewsletterSignup } from './NewsletterSignup';
-import { PaymentMethodBadges } from './PaymentMethodBadges';
+import React from "react";
+import Link from "next/link";
+import { BrandLogo } from "@/components/ui/BrandLogo";
+import { NewsletterSignup } from "./NewsletterSignup";
+import { PaymentMethodBadges } from "./PaymentMethodBadges";
 
 interface FooterLink {
   label: string;
@@ -16,21 +16,21 @@ interface FooterSection {
 
 const FOOTER_SECTIONS: FooterSection[] = [
   {
-    title: 'Shopping & Catalog',
+    title: "Shopping & Catalog",
     links: [
-      { label: 'All Products', href: '/products' },
-      { label: 'Categories', href: '/products' },
-      { label: 'Daily Deals & Bundles', href: '#' },
-      { label: 'Order History', href: '#' },
+      { label: "All Products", href: "/products" },
+      { label: "Categories", href: "/products" },
+      { label: "Daily Deals & Bundles", href: "#" },
+      { label: "Order History", href: "#" },
     ],
   },
   {
-    title: 'Customer Care',
+    title: "Customer Care",
     links: [
-      { label: 'Help Center', href: '#' },
-      { label: 'Returns & Warranties', href: '#' },
-      { label: 'Shipping Rates & Policies', href: '#' },
-      { label: 'Security & Fraud Shield', href: '#' },
+      { label: "Help Center", href: "#" },
+      { label: "Returns & Warranties", href: "#" },
+      { label: "Shipping Rates & Policies", href: "#" },
+      { label: "Security & Fraud Shield", href: "#" },
     ],
   },
 ];
@@ -42,12 +42,13 @@ export function Footer() {
       <NewsletterSignup />
 
       {/* Main Footer Content Grid */}
-      <div className="max-w-7xl mx-auto px-margin py-space-xl grid grid-cols-2 md:grid-cols-4 gap-space-xl">
+      <div className="max-w-7xl mx-auto px-4 min-[426px]:px-6 md:px-margin py-space-xl grid grid-cols-1 min-[426px]:grid-cols-2 md:grid-cols-4 gap-space-xl">
         {/* Brand Information Column */}
         <div className="space-y-space-md">
           <BrandLogo size="sm" />
           <p className="text-xs leading-relaxed text-on-surface-variant">
-            Enterprise digital marketplace curated for high-velocity commerce and next-gen retail enthusiasts.
+            Enterprise digital marketplace curated for high-velocity commerce
+            and next-gen retail enthusiasts.
           </p>
         </div>
 
@@ -77,9 +78,9 @@ export function Footer() {
       </div>
 
       {/* Bottom Legal Bar */}
-      <div className="max-w-7xl mx-auto px-margin py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-on-surface-variant text-xs border-t border-surface-container">
+      <div className="max-w-7xl mx-auto px-4 min-[426px]:px-6 md:px-margin py-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-on-surface-variant text-xs border-t border-surface-container text-center md:text-left">
         <p>© 2026 V-STORE Commerce Global Inc. All rights reserved.</p>
-        <div className="flex items-center gap-space-lg">
+        <div className="flex flex-wrap items-center justify-center gap-space-md sm:gap-space-lg">
           <Link className="hover:text-on-surface transition-colors" href="#">
             Privacy Policy
           </Link>

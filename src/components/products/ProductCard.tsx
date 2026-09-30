@@ -23,6 +23,11 @@ export function ProductCard({ product }: { product: Product }) {
       return;
     }
     addItem(product, quantity);
+    toast.success(
+      quantity > 1
+        ? `Added ${quantity}x "${product.title}" to cart`
+        : `Added "${product.title}" to cart`
+    );
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
