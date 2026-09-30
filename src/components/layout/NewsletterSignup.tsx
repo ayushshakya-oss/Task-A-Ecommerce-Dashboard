@@ -20,8 +20,10 @@ export function NewsletterSignup({ className = '' }: NewsletterSignupProps) {
   };
 
   return (
-    <div className={`bg-surface-container-low py-space-xl px-margin ${className}`}>
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-space-lg">
+    <div
+      className={`bg-surface-container-low py-space-xl px-4 min-[426px]:px-6 md:px-margin ${className}`}
+    >
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-space-lg text-center md:text-left">
         <div>
           <h4 className="text-sm font-semibold text-on-surface">
             Join the V-STORE Insider Club
@@ -33,7 +35,7 @@ export function NewsletterSignup({ className = '' }: NewsletterSignupProps) {
 
         <form
           onSubmit={handleSubscribe}
-          className="flex w-full md:w-auto items-center gap-space-sm"
+          className="flex flex-col min-[426px]:flex-row w-full md:w-auto items-stretch min-[426px]:items-center gap-space-sm"
         >
           <input
             type="email"
@@ -44,7 +46,7 @@ export function NewsletterSignup({ className = '' }: NewsletterSignupProps) {
           />
           <button
             type="submit"
-            className="px-space-lg py-2 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary-container transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer"
+            className="px-space-lg py-2 bg-primary text-on-primary text-xs font-semibold rounded-lg hover:bg-primary-container transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
           >
             {subscribed ? (
               <>

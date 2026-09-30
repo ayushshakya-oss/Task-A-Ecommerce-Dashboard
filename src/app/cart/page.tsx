@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useCartStore } from '@/stores/cart-store';
+import { toast } from '@/stores/toast-store';
 import { EmptyCart } from '@/components/cart/EmptyCart';
 import { CartItemRow } from '@/components/cart/CartItemRow';
 import { CartSummary } from '@/components/cart/CartSummary';
@@ -20,6 +21,25 @@ export default function CartPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleClearCart = () => {
+    clearCart();
+    toast.info('All items cleared from your cart');
+  };
+
+  const handleRemoveItem = (id: number) => {
+    const itemToRemove = items.find((i) => i.id === id);
+    removeItem(id);
+    toast.info(
+      itemToRemove
+        ? `Removed "${itemToRemove.title}" from cart`
+        : 'Item removed from cart'
+    );
+  };
+
+  const handleCheckout = () => {
+    toast.success(`Proceeding to checkout! Total: $${orderTotal.toFixed(2)}`);
+  };
 
   if (!mounted) {
     return (
@@ -38,7 +58,7 @@ export default function CartPage() {
 
   return (
     <main className="min-h-screen bg-background py-space-lg">
-      <div className="max-w-7xl mx-auto px-margin w-full">
+      <div className="max-w-7xl mx-auto px-4 min-[425px]:px-6 md:px-margin w-full">
         {/* Cart Page Header */}
         <div className="flex items-center justify-between mb-space-lg">
           <div>
@@ -51,7 +71,7 @@ export default function CartPage() {
           </div>
           {items.length > 0 && (
             <button
-              onClick={clearCart}
+              onClick={handleClearCart}
               type="button"
               className="text-xs text-error hover:bg-error-container/20 px-3 py-1.5 rounded-lg transition-all font-medium cursor-pointer"
             >
@@ -72,7 +92,7 @@ export default function CartPage() {
                     key={item.id}
                     item={item}
                     onUpdateQuantity={updateQuantity}
-                    onRemove={removeItem}
+                    onRemove={handleRemoveItem}
                   />
                 ))}
               </div>
@@ -97,6 +117,7 @@ export default function CartPage() {
               shipping={shipping}
               tax={tax}
               orderTotal={orderTotal}
+              onCheckout={handleCheckout}
             />
           </div>
         )}

@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 interface PromoBannerProps {
   code?: string;
@@ -13,23 +12,22 @@ export function PromoBanner({
   className = '',
 }: PromoBannerProps) {
   return (
-    <div className={`bg-surface-container-low py-space-xs px-margin ${className}`}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] text-on-surface-variant font-medium">
+    <div
+      className={`bg-surface-container-low py-1.5 px-4 min-[800px]:px-margin border-b border-surface-container/40 ${className}`}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-center text-center text-[11px] text-on-surface-variant font-medium">
         <span>
-          Flash Sale: Up to {discount} off high-performance hardware & accessories with code{' '}
-          <strong className="text-primary font-semibold">{code}</strong>
+          Flash Sale: Up to {discount} off{' '}
+          <span className="hidden sm:inline">
+            high-performance hardware &amp; accessories{' '}
+          </span>
+          with code{' '}
+          <strong className="text-primary font-semibold tracking-wide bg-primary/10 px-1.5 py-0.5 rounded text-[10px] ml-0.5">
+            {code}
+          </strong>
         </span>
-        <div className="hidden sm:flex items-center gap-space-lg">
-          <Link className="hover:text-on-surface transition-colors" href="#">
-            Track Order
-          </Link>
-          <Link className="hover:text-on-surface transition-colors" href="#">
-            Support 24/7
-          </Link>
-          <span className="text-outline-variant">|</span>
-          <span>USD ($)</span>
-        </div>
       </div>
     </div>
   );
 }
+

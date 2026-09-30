@@ -63,13 +63,14 @@ export function UserProfileDropdown() {
   // Not authenticated: Show Sign In button
   if (!isAuthenticated || !user) {
     return (
-      <Link href="/login">
+      <Link href="/login" className="shrink-0">
         <Button
           variant="surface"
           size="md"
-          leftIcon={<LogIn className="w-3.5 h-3.5 text-primary" />}
+          className="px-2.5 min-[425px]:px-4 py-1.5 min-[425px]:py-2 text-[11px] min-[425px]:text-xs gap-1.5 min-[425px]:gap-2 whitespace-nowrap"
+          leftIcon={<LogIn className="w-3.5 h-3.5 text-primary shrink-0" />}
         >
-          Sign In
+          <span>Sign In</span>
         </Button>
       </Link>
     );
@@ -78,12 +79,12 @@ export function UserProfileDropdown() {
   const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative shrink-0" ref={dropdownRef}>
       {/* Profile Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-2 pl-space-sm p-1.5 rounded-lg hover:bg-surface-container-low transition-all cursor-pointer text-left"
+        className="flex items-center gap-1.5 min-[425px]:gap-2 pl-2 min-[425px]:pl-space-sm p-1.5 rounded-lg hover:bg-surface-container-low transition-all cursor-pointer text-left"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >

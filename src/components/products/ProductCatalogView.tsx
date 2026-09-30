@@ -178,10 +178,12 @@ export function ProductCatalogView({
     });
 
     return [...list].sort((a, b) => {
+      const priceA = Number(a.price) || 0;
+      const priceB = Number(b.price) || 0;
       if (currentSort === "desc") {
-        return b.id - a.id;
+        return priceB - priceA;
       }
-      return a.id - b.id;
+      return priceA - priceB;
     });
   }, [
     initialProducts,
@@ -221,7 +223,7 @@ export function ProductCatalogView({
     <div className="w-full">
       {/* Sub-Header Status & Breadcrumbs Bar */}
       <div className="w-full bg-surface-container-lowest shadow-sm mb-space-lg border-b border-surface-container">
-        <div className="max-w-7xl mx-auto px-margin py-space-md flex flex-wrap items-center justify-between gap-space-md">
+        <div className="max-w-7xl mx-auto px-3 min-[400px]:px-4 min-[425px]:px-6 md:px-margin py-space-md flex flex-wrap items-center justify-between gap-space-md">
           <div className="flex flex-wrap items-center gap-space-sm text-on-surface-variant">
             <Breadcrumbs items={[{ label: "Products" }]} />
             <span className="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
@@ -239,18 +241,18 @@ export function ProductCatalogView({
             </div>
           </div>
 
-          <div className="flex items-center gap-space-sm">
+          <div className="flex items-center gap-2 min-[400px]:gap-space-sm max-[740px]:w-full max-[740px]:justify-end">
             {/* Filter Drawer Toggle Button for < 1024px */}
             <button
               onClick={() => setIsMobileFiltersOpen(true)}
-              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-surface-container bg-surface-container-low hover:bg-surface-container text-xs font-semibold text-on-surface transition-all cursor-pointer shadow-xs active:scale-95"
+              className="lg:hidden inline-flex items-center gap-1 min-[400px]:gap-1.5 px-2.5 min-[400px]:px-3 py-1.5 rounded-lg border border-surface-container bg-surface-container-low hover:bg-surface-container text-xs font-semibold text-on-surface transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
               type="button"
               aria-label="Open product filters"
             >
-              <Filter className="w-3.5 h-3.5 text-primary" />
+              <Filter className="w-3.5 h-3.5 text-primary shrink-0" />
               <span>Filters</span>
               {activeFiltersCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center">
+                <span className="w-4 h-4 min-[400px]:w-5 min-[400px]:h-5 rounded-full bg-primary text-on-primary text-[9px] min-[400px]:text-[10px] font-bold flex items-center justify-center shrink-0">
                   {activeFiltersCount}
                 </span>
               )}
